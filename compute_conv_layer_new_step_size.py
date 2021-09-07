@@ -1,4 +1,4 @@
-def compute_conv_layer_new_step_size(self, input_size, kernel_size, padding=0, stride=1):
+def compute_conv_layer_new_step_size(input_size, kernel_size, padding=0, stride=1):
         """Calculates '?' in (n, ?, filters) from convolutional layers.
 
         From https://dingyan89.medium.com/calculating-parameters-of-convolutional-and-fully-connected-layers-with-keras-186590df36c6
