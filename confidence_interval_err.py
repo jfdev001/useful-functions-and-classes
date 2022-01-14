@@ -1,3 +1,6 @@
+import numpy as np
+import scipy.stats as st
+
 def confidence_interval_err(vector: np.ndarray, alpha: float = 0.95):
     """Computes desired confidence interval error."""
 
