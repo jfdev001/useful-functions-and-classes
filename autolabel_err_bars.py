@@ -1,3 +1,6 @@
+from matplotlib.axes import Axes
+from matplotlib.container import BarContainer
+
 def autolabel_err_bars(
         ax: Axes,
         barcontainer: BarContainer,
