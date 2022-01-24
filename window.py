@@ -5,6 +5,30 @@ def window(arr, time_lag, forecast_horizon, sampling_rate=1):
     
     TODO: Specify label column indices or name of labels.
     
+    
+    Example:
+    ```
+    >>> # Create time series windows with 2 time steps
+    >>> # in the past (`time_lag`) used to predict 
+    >>> # 3 time steps in future (`forecast_horizon`).
+    >>> # Note that with `sampling_rate=1`, the 
+    >>> # difference between the elements of rows 
+    >>> # is 1. If the sampling rate is increased,
+    >>> # it essentially decreases the number rows
+    >>> # and increases the difference between elements
+    >>> # of rows.
+    >>> arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    >>> windowed_data = window(arr=arr, time_lag=2, forecast_horizon=3, sampling_rate=1)
+    >>> windowed_data
+    [([0, 1], [2, 3, 4]),
+    ([1, 2], [3, 4, 5]),
+    ([2, 3], [4, 5, 6]),
+    ([3, 4], [5, 6, 7]),
+    ([4, 5], [6, 7, 8]),
+    ([5, 6], [7, 8, 9]),
+    ([6, 7], [8, 9, 10])]
+    ```
+    
     Args:
       arr: Array with the first index as time steps.
       time_lag: Time steps in the past.
@@ -17,20 +41,6 @@ def window(arr, time_lag, forecast_horizon, sampling_rate=1):
       Windowed data of the form [(feature, target)] 
       where feature and targets are arrays whose length
       is determined by the `time_lag` and `forecast_horizon`.
-      
-    Example:
-    ```
-    >>> arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    >>> windowed_data = window(arr=arr, time_lag=2, forecast_horizon=3, sampling_rate=1)
-    >>> windowed_data
-    [([0, 1], [2, 3, 4]),
-    ([1, 2], [3, 4, 5]),
-    ([2, 3], [4, 5, 6]),
-    ([3, 4], [5, 6, 7]),
-    ([4, 5], [6, 7, 8]),
-    ([5, 6], [7, 8, 9]),
-    ([6, 7], [8, 9, 10])]
-    ```
     """
 
     windowed_data = []
