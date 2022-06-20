@@ -2,7 +2,17 @@ import numpy as np
 import scipy.stats as st
 
 def confidence_interval_err(vector: np.ndarray, alpha: float = 0.95):
-    """Computes desired confidence interval error."""
+    """Computes desired confidence interval error.
+    
+    https://en.wikipedia.org/wiki/Confidence_interval
+     
+    Args:
+        vector: List of values over which a confidence interval will be computed.
+        alpha: Confidence level.
+ 
+    Returns:
+        The confidence level error
+    """
 
     # Validate
     if not(alpha > 0. and alpha < 1,):
