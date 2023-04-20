@@ -52,3 +52,24 @@ def window(arr, time_lag, forecast_horizon, sampling_rate=1):
         windowed_data.append((feature, target))
         
     return windowed_data
+
+
+def np_window(x, y, lag, horizon: int = 1):
+    """Sliding window over x and y data.
+    
+    Sampling rate is 1 and sequence stride is 1.
+    """
+    x_windowed = sliding_window_view(
+        x[:-lag], window_shape=lag)
+    y_windowed = sliding_window_view(
+        y[lag:], window_shape=horizon,)
+    
+    if len(x_windowed) < len(y_windowed):
+        y_windowed = y_windowed[:len(x_windowed), :]
+    else:
+        x_windowed = x_windowed[:len(y_windowed), :]
+    
+    if horizon == 1:
+        y_windowed = np.squeeze(y_windowed)
+    
+    return x_windowed, y_windowed
