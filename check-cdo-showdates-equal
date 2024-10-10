@@ -1,0 +1,42 @@
+#!/usr/bin/bash
+
+# Prints whether two textfiles containing GRIB date information from `cdo` 
+#   contain the same start and end dates. 
+#
+# Args:
+#   $1 - Path to file containing the first set of outputs from `cdo -showdate f1`
+#   $2 - Path to file containing the second set of outputs from `cdo -showdate f2`  
+showdates1=$1
+showdates2=$2
+if [ "$showdates1" == "" ]   || [ "$showdates2" == "" ] ||\
+   [ "$showdates1" == "-h" ] || [ "$showdates1" == "--help" ]
+then
+    echo "usage: check-cdo-showdates-equal [-h --help] [showdates-file-1] [showdates-file-2]"
+    printf "\nPrints whether two textfiles containing GRIB date information from 'cdo'"
+    printf "\ncontain the same start and end dates.\n"
+    exit 1 
+fi 
+
+# get date info for first file
+firstline_showdates1=$(head -n 1 $showdates1)
+lastline_showdates1=$(tail -n 1 $showdates1)
+firstdate_showdates1=$(echo "$firstline_showdates1" | awk '{print $1}')
+lastdate_showdates1=$(echo "$lastline_showdates1" | awk '{print $NF}')
+
+# get date info for second file 
+firstline_showdates2=$(head -n 1 $showdates2)
+lastline_showdates2=$(tail -n 1 $showdates2)
+firstdate_showdates2=$(echo "$firstline_showdates2" | awk '{print $1}')
+lastdate_showdates2=$(echo "$lastline_showdates2" | awk '{print $NF}')
+
+# check to see the dates equal one another
+if [ "$firstdate_showdates1" == "$firstdate_showdates2" ] &&\
+   [ "$lastdate_showdates1" == "$lastdate_showdates2" ]
+then
+    echo "$showdates1 and $showdates2 have the same start and end dates"
+    echo "$firstdate_showdates1 --> $lastdate_showdates1"
+else
+    echo "$showdates1 and $showdates2 do not have the same start and end dates"
+    echo "$showdates1 --> $firstdate_showdates1 to $lastdate_showdates1"
+    echo "$showdates2 --> $firstdate_showdates2 to $lastdate_showdates2"
+fi
