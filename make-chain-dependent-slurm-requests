@@ -1,0 +1,35 @@
+#!/usr/bin/bash
+
+# Calls `sbatch --dependency: ...` on each line in a text file where each 
+#   subsquent line is dependent on the previous line.
+#
+# Examples:
+# ```shell
+# # Assumes `run.job` is some valid SLURM script
+# run.job arg1 >> requests.txt
+# run.job arg2 >> requests.txt
+# run.job arg3 >> requests.txt 
+# make_chain_dependent_slurm_requests requests.txt 
+# ```
+# 
+# Args:
+#   $1 - Path to a text file where each line is a valid SLURM script invocation.
+# 
+fname=$1
+if [ "$fname" == "" ]; then
+    echo "usage: make_chain_dependent_slurm_requests [fname]"
+    exit 1
+fi
+
+# make first request  
+read -r request < $fname
+ID=$(sbatch --parsable $request) 
+echo sbatch --parsable $request
+
+# read remainder of file and make chain dependent requests 
+i=1
+while IFS= read -r request_i; do
+    test $i -eq 1 && ((i=i+1)) && continue # skip first request 
+    ID=$(sbatch --parsable --dependency=after:${ID} ${request_i})
+    echo sbatch --parsable --dependency=after:${ID} ${request_i}
+done < $fname 
