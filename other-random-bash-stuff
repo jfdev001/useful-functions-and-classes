@@ -1,0 +1,8 @@
+#!/usr/bin/bash
+# random aliases and bash funcs
+alias find-pattern='echo find . -maxdepth 1 -type f ! -name \"*.nc\" ! -name \"*.txt\"'
+
+function grep_file_extensions {
+  echo "could use * instead of \\S+ to get anything before the ." 
+  echo "find /path/to/dir -f | grep -E '\\S+\.(py|ksh)'"
+}
