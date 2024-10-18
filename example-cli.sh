@@ -44,9 +44,13 @@ case "$flag" in
     u) USERNAME=$OPTARG;;
     p) PASSWORD=$OPTARG;;
     d) DATABASE=$OPTARG;;
-    h|*) echo "$heredoc"
-         exit 1
-         ;;
+    h) echo "$heredoc"
+       exit 0
+       ;;
+    *) echo "ERROR: unrecognized flags!"
+       echo "Try '$name -h' for more information."
+       exit 1
+       ;;
 esac
 done
 
