@@ -8,6 +8,9 @@
 # argparse output from mars -h
 # https://github.com/petsc/petsc/blob/0f6b61ebcc3e6537ba558a641cd0ae0acf185194/lib/petsc/bin/petscdiff#L35
 
+# TODO: Expand to allow long style options with something like `--input arg`
+# https://stackoverflow.com/questions/9271381/how-can-i-parse-long-form-arguments-in-shell
+
 # Setup CLI
 name=$(basename $0)
 length_name=${#name}
