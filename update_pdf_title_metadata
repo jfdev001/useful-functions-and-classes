@@ -3,8 +3,8 @@ trap 'echo "Error at ${LINENO}: ${BASH_COMMAND}" 2>&1' ERR
 usage=$(cat << EOF
 usage: $0 [-h] [-i] PDF NEW_TITLE
 
-Update a PDF metadata with a NEW_TITLE and then output that PDF to standard out
-by default. Pass -i to update the PDF inplace.
+Update a PDF metadata with a NEW_TITLE and then output the updated PDF to a
+default path '\${PDF}_updated'. Pass -i to update the PDF inplace.
 
 positional arguments:
     PDF        Path to PDF to update.
@@ -14,7 +14,7 @@ positional arguments:
 optional arguments:
     -h         Print a help message and exit.
 
-    -i         Update the PDF title metadata inplace.
+    -i         Update the PDF inplace, thus removing any intermediate outputs.
 EOF
 )
 inplace=0
@@ -39,6 +39,8 @@ PDF=$1
 NEW_TITLE=$2
 
 # Script exits immediately on error and errors on uninitialized variables 
+# NOTE: when using grep, grep exits 1 on failure to pattern match and therefore
+# '|| true' is needed when saving grep output to use in test expressions
 set -eu
 
 # Check if all positional arguments were provided
@@ -57,14 +59,42 @@ then
     exit 1
 fi
 
-# update title metadata 
+# update title metadata
 cur_metadata=$(pdftk "${PDF}" dump_data_utf8)
-set -x 
-has_title_metadata=$(grep "InfoKey: Title" <<< "${cur_metadata}")
-
-if [[ ${inplace} -eq 0 ]]
+has_title_metadata=$(grep -n "InfoKey: Title" <<< "${cur_metadata}" || true)
+if [[ -n "${has_title_metadata}" ]]
 then
-    :
-else
-    :
+    # remove existing metadata
+    lineno_infokey_title=$(grep --only-matching --perl-regexp \
+        "\d*(?=:)" <<< "${has_title_metadata}")
+    lineno_infobegin=$((lineno_infokey_title - 1))
+    lineno_infovalue=$((lineno_infokey_title + 1))
+    cur_metadata="$(printf '%s\n' "${cur_metadata}" | \
+        sed "${lineno_infobegin}d;${lineno_infokey_title}d;${lineno_infovalue}d")"
 fi
+
+# Define the new metadata
+title_metadata=$(cat << EOF
+InfoBegin
+InfoKey: Title
+InfoValue: ${NEW_TITLE}
+EOF
+)
+title_metadata="${title_metadata}"$'\n'
+new_metadata="${title_metadata}${cur_metadata}"
+output_pdf_path="${PDF}_updated"
+tmp_new_metdata="/tmp/new_metadata"
+echo "${new_metadata}" > "${tmp_new_metdata}"
+
+# update the pdf 
+pdftk "${PDF}" update_info_utf8 "${tmp_new_metdata}" output "${output_pdf_path}"
+
+if [[ ${inplace} -eq 1 ]]
+then
+    rm "${PDF}"
+    mv "${output_pdf_path}" "${PDF}"
+    output_pdf_path="${PDF}"
+fi
+
+echo "output written to ${output_pdf_path}"
+rm "${tmp_new_metdata}"
