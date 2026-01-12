@@ -1,0 +1,70 @@
+#!/usr/bin/bash
+trap 'echo "Error at ${LINENO}: ${BASH_COMMAND}" 2>&1' ERR
+usage=$(cat << EOF
+usage: $0 [-h] [-i] PDF NEW_TITLE
+
+Update a PDF metadata with a NEW_TITLE and then output that PDF to standard out
+by default. Pass -i to update the PDF inplace.
+
+positional arguments:
+    PDF        Path to PDF to update.
+
+    NEW_TITLE  The new metadata title for the PDF.
+
+optional arguments:
+    -h         Print a help message and exit.
+
+    -i         Update the PDF title metadata inplace.
+EOF
+)
+inplace=0
+while getopts "hi" flag
+do
+    case "${flag}" in
+        h)  echo "${usage}"
+            exit 0
+            ;;
+        i) inplace=1;;
+        *)  echo "ERROR: unrecognized flags"
+            echo "try $0 -h"
+            exit 1 
+            ;;
+    esac 
+done
+
+# shift past options to get positionals 
+shift $(($OPTIND - 1))
+n_positional_args=2
+PDF=$1
+NEW_TITLE=$2
+
+# Script exits immediately on error and errors on uninitialized variables 
+set -eu
+
+# Check if all positional arguments were provided
+if [ $# -lt $n_positional_args ]
+then
+    echo "ERROR: Missing positional arguments!"
+    echo "Try '$0 -h' for more information."
+    exit 1
+fi
+
+# Verify positionals
+if [[ ! -f "${PDF}" ]]
+then
+    echo "ERROR: PDF does not exist"
+    echo "Got ${PDF}"
+    exit 1
+fi
+
+# update title metadata 
+cur_metadata=$(pdftk "${PDF}" dump_data_utf8)
+set -x 
+has_title_metadata=$(grep "InfoKey: Title" <<< "${cur_metadata}")
+
+if [[ ${inplace} -eq 0 ]]
+then
+    :
+else
+    :
+fi
